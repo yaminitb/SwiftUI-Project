@@ -12,6 +12,8 @@ struct SignUp: View {
     @State private var emailId: String = ""
     @State private var password: String = ""
     @State private var fullName: String = ""
+    @State private var askOTP: Bool = false
+    @State private var otpText: String = ""
 
     var body: some View {
         VStack(alignment: .leading,spacing: 15, content: {
@@ -40,7 +42,7 @@ struct SignUp: View {
                     .padding(.top, 5)
                 
                 GradientButton(title: "Continue", icon: "arrow.right") {
-                    
+                    askOTP.toggle()
                 }.hSpacing(.trailing)
                     .disableWithOpacity(emailId.isEmpty || password.isEmpty || fullName.isEmpty)
             }.padding(.top,20)
@@ -60,6 +62,16 @@ struct SignUp: View {
         .padding(.vertical,15)
         .padding(.horizontal,25)
         .toolbar(.hidden,for: .navigationBar)
+        .sheet(isPresented: $askOTP) {
+            if #available(iOS 16.4, *) {
+                OTPView(otpText: $otpText)
+                    .presentationDetents([.height(350)])
+                    .presentationCornerRadius(30)
+            }else{
+                OTPView(otpText: $otpText)
+                    .presentationDetents([.height(350)])
+            }
+        }
     }
 }
 

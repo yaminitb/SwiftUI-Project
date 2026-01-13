@@ -10,6 +10,8 @@ import SwiftUI
 struct OTPView: View {
     @Binding var otpText : String
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject var authManager: AuthManager
+
     var body: some View {
         VStack(alignment: .leading,spacing: 15, content: {
             Button(action: {
@@ -19,7 +21,7 @@ struct OTPView: View {
                     .font(.title2)
                     .foregroundStyle(.gray)
             })
-            .padding(.top, 10)
+            .padding(.top, 15)
             Text("Enter OTP")
                 .font(.largeTitle)
                 .fontWeight(.heavy)
@@ -32,11 +34,14 @@ struct OTPView: View {
             VStack(spacing: 25) {
                
                 OTPVerificationView(otpText: $otpText)
-                GradientButton(title: "Send Link", icon: "arrow.right") {
+                GradientButton(title: "Submit", icon: "arrow.right") {
+                     authManager.login()
+
                     
                 }.hSpacing(.trailing)
                     .disableWithOpacity(otpText.isEmpty)
             }.padding(.top,20)
+                Spacer(minLength: 0)
            
         })
         .padding(.vertical,15)

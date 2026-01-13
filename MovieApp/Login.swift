@@ -15,7 +15,8 @@ struct Login: View {
     @State private var password: String = ""
     @State private var showForgotPasswordView: Bool = false
     @State private var showResetView: Bool = false
-    @EnvironmentObject var authManager: AuthManager
+    @State private var askOTP: Bool = false
+    @State private var otpText: String = ""
 
     var body: some View {
         VStack(alignment: .leading,spacing: 15, content: {
@@ -40,8 +41,8 @@ struct Login: View {
                     .tint(.appYellow)
                     .hSpacing(.trailing)
                 GradientButton(title: "Login", icon: "arrow.right") {
-                    showHome.toggle()
-                    authManager.login()
+                    askOTP.toggle()
+                    
                 }
                 
                 .hSpacing(.trailing)
@@ -80,6 +81,16 @@ struct Login: View {
                     .presentationCornerRadius(30)
             }else{
                 PasswordResetView()
+                    .presentationDetents([.height(350)])
+            }
+        }
+        .sheet(isPresented: $askOTP) {
+            if #available(iOS 16.4, *) {
+                OTPView(otpText: $otpText)
+                    .presentationDetents([.height(350)])
+                    .presentationCornerRadius(30)
+            }else{
+                OTPView(otpText: $otpText)
                     .presentationDetents([.height(350)])
             }
         }
