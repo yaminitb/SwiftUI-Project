@@ -1,0 +1,37 @@
+//
+//  Untitled.swift
+//  LoginApp
+//
+//  Created by MacMini on 08/01/26.
+//
+
+import Foundation
+import CoreLocation
+import MapKit
+internal import Combine
+
+class LocationManager: NSObject,ObservableObject {
+    @Published var location: CLLocation?
+    @Published var region: MKCoordinateRegion = MKCoordinateRegion.defaultRegion()
+    private let locationManager = CLLocationManager()
+    override init() {
+        super.init()
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        locationManager.distanceFilter = kCLDistanceFilterNone
+        locationManager.requestAlwaysAuthorization()
+        locationManager.startUpdatingLocation()
+        locationManager.delegate = self
+    }
+}
+extension LocationManager : CLLocationManagerDelegate
+{
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        guard let location = locations.last else { return }
+        DispatchQueue.main.async {[weak self] in
+            self?.location = location
+            self?.region = MKCoordinateRegion(center: location.coordinate, latitudinalMeters: 5000,longitudinalMeters: 5000)
+        }
+        
+    }
+}
+
