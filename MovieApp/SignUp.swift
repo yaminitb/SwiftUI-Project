@@ -14,6 +14,7 @@ struct SignUp: View {
     @State private var fullName: String = ""
     @State private var askOTP: Bool = false
     @State private var otpText: String = ""
+    @State private var showBoarding: Bool = false
 
     var body: some View {
         VStack(alignment: .leading,spacing: 15, content: {
@@ -64,11 +65,11 @@ struct SignUp: View {
         .toolbar(.hidden,for: .navigationBar)
         .sheet(isPresented: $askOTP) {
             if #available(iOS 16.4, *) {
-                OTPView(otpText: $otpText)
+                OTPView(otpText: $otpText,showBoarding: $showBoarding)
                     .presentationDetents([.height(350)])
                     .presentationCornerRadius(30)
             }else{
-                OTPView(otpText: $otpText)
+                OTPView(otpText: $otpText,showBoarding: $showBoarding)
                     .presentationDetents([.height(350)])
             }
         }

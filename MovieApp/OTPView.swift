@@ -9,8 +9,9 @@ import SwiftUI
 
 struct OTPView: View {
     @Binding var otpText : String
+    @Binding var showBoarding : Bool
+
     @Environment(\.dismiss) private var dismiss
-    @EnvironmentObject var authManager: AuthManager
 
     var body: some View {
         VStack(alignment: .leading,spacing: 15, content: {
@@ -35,8 +36,8 @@ struct OTPView: View {
                
                 OTPVerificationView(otpText: $otpText)
                 GradientButton(title: "Submit", icon: "arrow.right") {
-                     authManager.login()
-
+                    dismiss()
+                    showBoarding = true
                     
                 }.hSpacing(.trailing)
                     .disableWithOpacity(otpText.isEmpty)
