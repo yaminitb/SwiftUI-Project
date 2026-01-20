@@ -22,6 +22,9 @@ struct TabView2: View {
             Tab(Constants.downloadString,systemImage: Constants.downloadIconString){
                 DownloadView()
             }
+            Tab(Constants.profileString,systemImage: Constants.profileIconString) {
+                ProfileView()
+            }
         }
     }
 }
