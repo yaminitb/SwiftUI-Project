@@ -37,6 +37,8 @@ struct SignUp: View {
                 .padding(.top, -5)
             VStack(spacing: 25) {
                 CustomTF(sfIcon: "at", hint: "Email ID", value: $emailId)
+                    .keyboardType(.emailAddress)
+
                 CustomTF(sfIcon: "person", hint: "Full Name", value: $fullName)
                     .padding(.top, 5)
                 CustomTF(sfIcon: "lock", hint: "Password",isPassword: true, value: $password)
@@ -44,6 +46,8 @@ struct SignUp: View {
                 
                 GradientButton(title: "Continue", icon: "arrow.right") {
                     askOTP.toggle()
+                    saveData()
+
                 }.hSpacing(.trailing)
                     .disableWithOpacity(emailId.isEmpty || password.isEmpty || fullName.isEmpty)
             }.padding(.top,20)
@@ -73,6 +77,23 @@ struct SignUp: View {
                     .presentationDetents([.height(350)])
             }
         }
+        .sheet(isPresented: $showBoarding) {
+            if #available(iOS 16.4, *) {
+                OnboardingView()
+                  //  .presentationDetents([.height(350)])
+                    .presentationCornerRadius(30)
+            }else{
+                OnboardingView()
+                  //  .presentationDetents([.height(350)])
+            }
+        }
+    }
+    func saveData()
+    {
+        UserDefaults.standard.set(self.emailId, forKey: "email")
+        UserDefaults.standard.set(self.password, forKey: "password")
+        UserDefaults.standard.set(self.fullName, forKey: "name")
+
     }
 }
 

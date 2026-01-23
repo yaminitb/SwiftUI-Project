@@ -32,6 +32,7 @@ struct Login: View {
                 .padding(.top, -5)
             VStack(spacing: 25) {
                 CustomTF(sfIcon: "at", hint: "Email ID", value: $emailId)
+                    .keyboardType(.emailAddress)
                 CustomTF(sfIcon: "lock", hint: "Password",isPassword: true, value: $password)
                     .padding(.top, 5)
                 
@@ -43,6 +44,7 @@ struct Login: View {
                     .hSpacing(.trailing)
                 GradientButton(title: "Login", icon: "arrow.right") {
                     askOTP.toggle()
+                    saveData()
                     
                 }
                 
@@ -106,6 +108,12 @@ struct Login: View {
             }
         }
     }
+    func saveData()
+    {
+        UserDefaults.standard.set(self.emailId, forKey: "email")
+        UserDefaults.standard.set(self.password, forKey: "password")
+    }
+    
 }
 
 #Preview {

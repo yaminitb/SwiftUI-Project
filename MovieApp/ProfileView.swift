@@ -6,10 +6,12 @@
 //
 
 import SwiftUI
-
+import PhotosUI
 struct ProfileView: View {
+    @EnvironmentObject var authManager: AuthManager
+
     @State private var user = UserProfile(
-        name: "Burak Selcuk",
+        name: "Yamini",
         email: "burak.selcuk@burak.com",
         phoneNumber: "+1 555 123 45 67",
         membershipLevel: "Gold Member",
@@ -17,24 +19,45 @@ struct ProfileView: View {
         favoriteStore: "Downtown Branch",
         joinDate: "March 2023"
     )
-    
+    @State private var avatarImage: UIImage?
+    @State private var photosPickerItem: PhotosPickerItem?
     @State private var showingEditProfile = false
     @State private var notificationsEnabled = false
     @State private var locationEnabled = true
-    
+    @State var savedName = ""
+    @State var savedEmail = ""
+    @State var savedPassword = ""
+
+    @ViewBuilder
+    private func imageView() -> some View {
+        Circle()
+                                        .fill(LinearGradient(
+                                            gradient: Gradient(colors: [.orange, .red]),
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        ))
+                                       .frame(width: 100, height: 100)
+    }
     var body: some View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 25) {
                     VStack(spacing: 15) {
                         ZStack {
-                            Circle()
-                                .fill(LinearGradient(
-                                    gradient: Gradient(colors: [.orange, .red]),
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                ))
-                                .frame(width: 100, height: 100)
+//                            Circle()
+//                                .fill(LinearGradient(
+//                                    gradient: Gradient(colors: [.orange, .red]),
+//                                    startPoint: .topLeading,
+//                                    endPoint: .bottomTrailing
+//                                ))
+//                                .frame(width: 100, height: 100)
+                            PhotosPicker(selection: $photosPickerItem, matching: .images) {
+                                Image(uiImage: ((avatarImage ?? UIImage(systemName: "play.fill")) ?? UIImage(systemName: "play.fill"))!)
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                                    .frame(width: 100, height: 100)
+                                    .clipShape(Circle())
+                            }
                             
                             Text(user.initials)
                                 .font(.title)
@@ -43,7 +66,7 @@ struct ProfileView: View {
                         }
                         
                         VStack(spacing: 5) {
-                            Text(user.name)
+                            Text(savedName)
                                 .font(.title2)
                                 .fontWeight(.bold)
                                 .foregroundColor(.primary)
@@ -70,9 +93,9 @@ struct ProfileView: View {
                         SectionHeader(title: "Personal Information")
                         
                         VStack(spacing: 0) {
-                            ProfileInfoRow(icon: "envelope.fill", title: "Email", value: user.email)
+                            ProfileInfoRow(icon: "envelope.fill", title: "Email", value: savedEmail)
                             Divider().padding(.leading, 50)
-                            ProfileInfoRow(icon: "phone.fill", title: "Phone", value: user.phoneNumber)
+                            ProfileInfoRow(icon: "phone.fill", title: "Phone", value: savedPassword)
                         }
                         .background(Color.white)
                         .cornerRadius(15)
@@ -126,6 +149,7 @@ struct ProfileView: View {
                     
                     Button(action: {
                         // Logout action
+                        authManager.logout()
                     }) {
                         HStack {
                             Image(systemName: "rectangle.portrait.and.arrow.right")
@@ -154,10 +178,28 @@ struct ProfileView: View {
                     .foregroundColor(.orange)
                 }
             }
+            .onChange(of: photosPickerItem) { _, _ in
+                Task{
+                    if let photosPickerItem, let data = try? await photosPickerItem.loadTransferable(type: Data.self) {
+                        if let image = UIImage(data: data) {
+                            avatarImage = image
+                        }
+                    }
+                    photosPickerItem = nil
+                }
+            }
         }
         .sheet(isPresented: $showingEditProfile) {
             EditProfileView(user: $user)
         }
+        .onAppear() {
+            getData()
+        }
+    }
+    func getData() {
+        savedName = UserDefaults.standard.string(forKey: "name") ?? "User"
+        savedEmail = UserDefaults.standard.string(forKey: "email") ?? "user@example.com"
+        savedPassword = UserDefaults.standard.string(forKey: "password") ?? "password"
     }
 }
 struct SettingsToggleRow: View {
